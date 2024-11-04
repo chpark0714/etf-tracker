@@ -1,1 +1,27 @@
- 
+ETF_LIST = {
+    'SPY': 'S&P 500 ETF',
+    'VOO': 'Vanguard S&P 500',
+    'VTI': 'Vanguard Total Stock Market',
+    'QQQ': 'Nasdaq 100 ETF',
+    'IVV': 'iShares Core S&P 500',
+    'BND': 'Vanguard Total Bond Market',
+    'VEA': 'Vanguard FTSE Developed Markets',
+    'VTV': 'Vanguard Value ETF',
+    'AGG': 'iShares Core U.S. Aggregate Bond',
+    'VUG': 'Vanguard Growth ETF',
+    'IEFA': 'iShares Core MSCI EAFE',
+    'VWO': 'Vanguard Emerging Markets',
+    'IJR': 'iShares Core S&P Small-Cap',
+    'IWF': 'iShares Russell 1000 Growth',
+    'IWM': 'iShares Russell 2000',
+    'VIG': 'Vanguard Dividend Appreciation',
+    'VXUS': 'Vanguard Total International Stock',
+    'VGT': 'Vanguard Information Technology',
+    'IEMG': 'iShares Core MSCI Emerging Markets',
+    'GLD': 'SPDR Gold Shares',
+    'LQD': 'iShares iBoxx Investment Grade Corporate Bond',
+    'VNQ': 'Vanguard Real Estate',
+    'TLT': 'iShares 20+ Year Treasury Bond',
+    'IWD': 'iShares Russell 1000 Value',
+    'EFA': 'iShares MSCI EAFE'
+} 
