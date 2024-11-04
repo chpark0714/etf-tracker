@@ -1,10 +1,12 @@
 import streamlit as st
-import yfinance as yf
+import pandas as pd
+import numpy as np
 import plotly.graph_objects as go
+import yfinance as yf
 from datetime import datetime
 
 # 페이지 설정
-st.set_page_config(page_title="Top 25 ETF 트래커", layout="wide")
+st.set_page_config(page_title="ETF 트래커", layout="wide", memory_limit=1024)
 st.title("Top 25 ETF 가격 동향")
 
 # ETF 목록
