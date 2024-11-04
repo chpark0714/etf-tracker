@@ -14,16 +14,21 @@ if 'language' not in st.session_state:
 
 # 사이드바 설정
 with st.sidebar:
+    # 이전 언어 저장
+    previous_language = st.session_state.language
+    
     # 언어 선택
     selected_language = st.selectbox(
         'Language / 언어 / 语言 / 言語 / Idioma',
         options=list(LANGUAGES.keys()),
-        index=list(LANGUAGES.keys()).index(st.session_state.language)
+        index=list(LANGUAGES.keys()).index(st.session_state.language),
+        key='language_selector'
     )
     
-    if selected_language != st.session_state.language:
+    # 언어가 변경되었을 때만 세션 상태 업데이트
+    if selected_language != previous_language:
         st.session_state.language = selected_language
-        st.experimental_rerun()
+        st.rerun()  # experimental_rerun() 대신 rerun() 사용
 
     lang = LANGUAGES[st.session_state.language]
     
