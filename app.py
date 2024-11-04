@@ -13,55 +13,91 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# CSS 적용
+# CSS 수정
 st.markdown("""
 <style>
     /* 모바일 스타일 */
     @media (max-width: 640px) {
+        /* 전체 배경 */
+        .main {
+            background-color: #f5f5f5;
+        }
+        
         /* 차트 컨테이너 */
         div.etf-card {
             background-color: white;
             padding: 15px;
             margin: 10px 0;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         
-        /* 구분선 */
-        div.etf-divider {
-            height: 20px;
-            margin: 10px -15px;
-            background-color: #f5f5f5;
-            border-top: 1px solid #e0e0e0;
-            border-bottom: 1px solid #e0e0e0;
+        /* 차트 여백 조정 */
+        .js-plotly-plot {
+            height: 300px !important;
+            margin-bottom: 70px !important;
         }
         
         /* 메트릭 컨테이너 */
         div.metrics-container {
-            background-color: #f8f9fa;
-            padding: 10px;
+            background: linear-gradient(to right, #f8f9fa, #ffffff, #f8f9fa);
+            padding: 12px;
             border-radius: 8px;
-            margin-top: 10px;
+            margin-top: 40px !important;
+            border: 1px solid rgba(0,0,0,0.05);
+            position: relative;
+            z-index: 1;
         }
         
-        /* 차트 크기 조정 */
-        .js-plotly-plot {
-            height: 300px !important;
+        /* Plotly 차트 컨테이너 추가 여백 */
+        .plot-container.plotly {
+            margin-bottom: 80px !important;
+        }
+        
+        /* x축 레이블 여백 확보 */
+        .xtick {
+            margin-bottom: 20px !important;
+        }
+        
+        /* 구분선 스타일 */
+        div.etf-divider {
+            height: 20px;
+            margin: 15px 0;
+            opacity: 0.5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+        }
+        
+        div.etf-divider::after {
+            content: "•••";
+            color: #ccc;
+            letter-spacing: 2px;
+            font-size: 12px;
+        }
+        
+        /* 메트릭 스타일링 */
+        .stMetric {
+            background: rgba(255,255,255,0.7);
+            border-radius: 6px;
+            padding: 8px !important;
+            border: 1px solid rgba(0,0,0,0.03);
+            margin-top: 5px !important;
+        }
+        
+        /* 스트림릿 기본 여백 제거 */
+        .block-container {
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        
+        /* 열 사이 여백 제거 */
+        .row-widget {
+            margin: 0 !important;
         }
     }
 </style>
-""", unsafe_allow_html=True)
-
-# 화면 너비 계산을 위한 JavaScript 추가
-st.markdown("""
-<script>
-    // 화면 너비를 세션 상태에 저장
-    if (window.innerWidth <= 640) {
-        window.mobile = true;
-    } else {
-        window.mobile = false;
-    }
-</script>
 """, unsafe_allow_html=True)
 
 # 세션 상태 초기화
@@ -70,17 +106,42 @@ if 'language' not in st.session_state:
 
 # 사이드바 설정
 with st.sidebar:
-    # ... (사이드바 코드는 동일)
-    pass
+    # 언어 선택
+    selected_language = st.selectbox(
+        'Language / 언어 / 语言 / 言語 / Idioma',
+        options=list(LANGUAGES.keys()),
+        index=list(LANGUAGES.keys()).index(st.session_state.language)
+    )
+    
+    if selected_language != st.session_state.language:
+        st.session_state.language = selected_language
+        st.rerun()
+
+    lang = LANGUAGES[st.session_state.language]
+    
+    st.header(lang['settings'])
+    period = st.selectbox(
+        lang['period'],
+        options=list(lang['periods'].keys()),
+        index=2  # 1개월을 기본값으로
+    )
+    
+    chart_type = st.radio(
+        lang['chart_type'],
+        [lang['candlestick'], lang['line']]
+    )
 
 # 화면 분할 (데스크톱에서는 3열, 모바일에서는 1열)
-use_container_width = True
-cols = st.columns(3)  # 기본적으로 3열로 설정
+cols = st.columns(3)
 
 # ETF 표시
 for i, symbol in enumerate(list(ETF_LIST.keys())[:6]):
-    with cols[i % 3]:  # 3열로 순환
+    with cols[i % 3]:
         try:
+            # 구분선 먼저 추가 (첫 번째 항목 제외)
+            if i > 0:
+                st.markdown('<div class="etf-divider"></div>', unsafe_allow_html=True)
+            
             # 카드 시작
             st.markdown('<div class="etf-card">', unsafe_allow_html=True)
             
@@ -108,10 +169,21 @@ for i, symbol in enumerate(list(ETF_LIST.keys())[:6]):
                 # 차트 레이아웃
                 fig.update_layout(
                     title=f'{symbol} - {ETF_LIST[symbol]}',
-                    height=400,  # 데스크톱에서는 더 큰 높이
-                    margin=dict(l=10, r=10, t=40, b=20),
-                    xaxis_rangeslider_visible=True,  # 데스크톱에서는 슬라이더 표시
-                    template="plotly_white"
+                    height=400,
+                    margin=dict(l=10, r=10, t=40, b=60),
+                    xaxis_rangeslider_visible=False,
+                    template="plotly_white",
+                    xaxis=dict(
+                        tickangle=0,
+                        tickfont=dict(size=10),
+                        ticktext=hist.index,
+                        dtick="M1",
+                        tickformat="%Y-%m-%d"
+                    ),
+                    yaxis=dict(
+                        side='right',
+                        tickformat=".2f"
+                    )
                 )
                 
                 st.plotly_chart(fig, use_container_width=True)
@@ -135,7 +207,12 @@ for i, symbol in enumerate(list(ETF_LIST.keys())[:6]):
                     f"${hist['High'].iloc[-1]:.2f}"
                 )
             
+            # 카드 종료
             st.markdown('</div>', unsafe_allow_html=True)
                 
         except Exception as e:
             st.error(f"Error loading {symbol}: {str(e)}")
+
+# 마지막 업데이트 시간
+st.sidebar.markdown("---")
+st.sidebar.info(f"{lang['last_update']}: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")

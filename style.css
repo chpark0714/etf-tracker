@@ -54,6 +54,28 @@
         border-top: 1px solid #e0e0e0;
         border-bottom: 1px solid #e0e0e0;
     }
+    
+    /* 모바일에서의 차트 컨테이너 */
+    .element-container {
+        margin: 0.5rem 0;
+        padding: 0.5rem 0;
+    }
+    
+    /* 모바일에서의 메트릭 스타일 */
+    .stMetric {
+        background-color: #f8f9fa;
+        padding: 0.5rem !important;
+        border-radius: 5px;
+        margin: 0.2rem 0;
+    }
+    
+    /* 구분선 스타일 */
+    hr {
+        margin: 1.5rem 0;
+        border: 0;
+        height: 1px;
+        background: #e0e0e0;
+    }
 }
 
 /* 전체 폰트 사이즈 조절 */
