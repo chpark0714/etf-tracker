@@ -136,7 +136,7 @@ cols = st.columns(3)
 
 # Display ETFs
 try:
-    for i, symbol in enumerate(list(ETF_LIST.keys())[:6]):
+    for i, symbol in enumerate(list(ETF_LIST.keys())[:25]):
         with cols[i % 3]:
             try:
                 st.markdown('<div class="etf-card">', unsafe_allow_html=True)
