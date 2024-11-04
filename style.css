@@ -1,89 +1,79 @@
-/* 모바일 최적화 */
+/* Mobile styles */
 @media (max-width: 640px) {
-    .stPlotlyChart {
+    
+    /* Chart margin adjustment */
+    .js-plotly-plot {
         height: 300px !important;
+        margin-bottom: 70px !important;
     }
     
-    /* 메트릭 컴팩트하게 */
-    .stMetric {
-        padding: 0.5rem !important;
+    /* Metrics container */
+    div.metrics-container {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px !important;
+        padding: 0 5px;
     }
     
-    /* 사이드바 더 컴팩트하게 */
-    .css-1d391kg {
-        padding: 1rem 0.5rem !important;
-    }
-    
-    /* 차트 간격 조절 */
-    .row-gap {
-        margin-bottom: 1rem !important;
-    }
-    
-    /* 모바일에서 차트 컨테이너 스타일링 */
-    .chart-box {
-        margin: 10px 5px;
-        padding: 15px;
-        border-radius: 10px;
-        background-color: white;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        border: 1px solid #e0e0e0;
-    }
-    
-    /* 차트 제목 스타일링 */
-    .chart-title {
-        font-size: 1.1rem;
-        font-weight: bold;
-        padding: 5px 0;
-        margin-bottom: 10px;
-        border-bottom: 2px solid #f0f0f0;
-    }
-    
-    /* 메트릭 컨테이너 스타일링 */
-    .metrics-box {
-        background-color: #f8f9fa;
-        padding: 10px;
+    /* Individual metric styling */
+    [data-testid="stMetricValue"] {
+        background: #181818;
+        padding: 10px !important;
         border-radius: 8px;
-        margin-top: 10px;
+        border: 1px solid #e5e7eb;
+        font-size: 1.1em !important;
+        color: #ffffff !important;
+        font-weight: 600 !important;
     }
     
-    /* 구분선 스타일링 */
-    .chart-divider {
-        height: 15px;
-        background-color: #f5f5f5;
-        margin: 20px -15px;
-        border-top: 1px solid #e0e0e0;
-        border-bottom: 1px solid #e0e0e0;
+    /* Metric label */
+    [data-testid="stMetricLabel"] {
+        color: #ffffff !important;
+        font-size: 0.85em !important;
+        font-weight: 500 !important;
+        margin-bottom: 5px !important;
     }
     
-    /* 모바일에서의 차트 컨테이너 */
-    .element-container {
-        margin: 0.5rem 0;
-        padding: 0.5rem 0;
+    /* Metric delta */
+    [data-testid="stMetricDelta"] {
+        font-size: 0.9em !important;
+        font-weight: 500 !important;
+        padding: 2px 6px !important;
+        border-radius: 4px;
     }
     
-    /* 모바일에서의 메트릭 스타일 */
+    /* Positive delta */
+    [data-testid="stMetricDelta"].positive {
+        color: #059669 !important;
+        background: #ecfdf5 !important;
+    }
+    
+    /* Negative delta */
+    [data-testid="stMetricDelta"].negative {
+        color: #dc2626 !important;
+        background: #fef2f2 !important;
+    }
+    
+    /* Remove default metric background */
     .stMetric {
-        background-color: #f8f9fa;
-        padding: 0.5rem !important;
-        border-radius: 5px;
-        margin: 0.2rem 0;
+        background: transparent !important;
+        box-shadow: none !important;
     }
     
-    /* 구분선 스타일 */
-    hr {
-        margin: 1.5rem 0;
-        border: 0;
-        height: 1px;
-        background: #e0e0e0;
+    /* Remove any extra padding from columns */
+    .row-widget.stColumn {
+        padding: 0 !important;
+        margin: 0 !important;
     }
 }
 
-/* 전체 폰트 사이즈 조절 */
+/* Full font size adjustment */
 .small-font {
     font-size: 0.8rem !important;
 }
 
-/* 차트 컨테이너 스타일링 */
+
+/* Chart container style */
 .chart-container {
     margin-bottom: 1rem;
     padding: 0.5rem;
@@ -91,27 +81,122 @@
     background-color: white;
 }
 
-/* 메트릭 스타일링 */
+/* Metric container style */
 .metric-container {
     display: flex;
     justify-content: space-between;
     margin-top: 0.5rem;
 }
 
-/* 사이드바 스타일링 */
+/* Sidebar style */
 .css-1d391kg {
     padding: 2rem 1rem;
 }
 
-/* 로딩 상태 스타일링 */
+/* Loading state style */
 .stSpinner {
     text-align: center;
     margin: 1rem 0;
 }
 
-/* 에러 메시지 스타일링 */
+/* Error message style */
 .stAlert {
     padding: 0.5rem;
     margin: 0.5rem 0;
     border-radius: 0.25rem;
-} 
+}
+
+/* Settings container styling */
+.stSelectbox, .stRadio {
+    background-color: white;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Radio button horizontal layout */
+.stRadio > div {
+    flex-direction: row !important;
+    gap: 2em;
+}
+
+/* Settings labels */
+.stSelectbox label, .stRadio label {
+    color: #555;
+    font-size: 0.9em;
+}
+
+/* Divider style */
+hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #e0e0e0, transparent);
+}
+
+/* Mobile optimization for settings */
+@media (max-width: 640px) {
+    .stSelectbox, .stRadio {
+        margin-bottom: 10px;
+    }
+    
+    /* Adjust radio button spacing */
+    .stRadio > div {
+        gap: 1em;
+    }
+}
+
+/* Remove default Streamlit padding */
+.block-container {
+    padding-top: 1rem !important;
+    padding-bottom: 0rem !important;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+}
+
+/* Remove extra white space */
+[data-testid="column"] {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Remove white space before cards */
+[data-testid="column"] > div {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Top settings margin */
+.stSelectbox:first-child {
+    margin-top: 1rem !important;
+}
+
+/* Settings container styling */
+.stSelectbox {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 1rem !important;
+    padding: 5px !important;
+}
+
+/* Remove default Streamlit padding but keep some top padding */
+.block-container {
+    padding: 2rem 5px 0rem 5px !important;
+}
+
+/* Page title styling */
+h1 {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(to right, #2563eb, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+@media (max-width: 640px) {
+    h1 {
+        font-size: 1.5rem !important;
+        margin: 0.8rem 0 !important;
+    }
+}
