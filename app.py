@@ -3,6 +3,7 @@ import yfinance as yf
 import plotly.graph_objects as go
 from datetime import datetime
 from languages import LANGUAGES
+from etf_data import ETF_LIST  # ETF 목록 import
 
 # 페이지 설정
 st.set_page_config(layout="wide")
@@ -12,7 +13,6 @@ if 'language' not in st.session_state:
     st.session_state.language = 'English'
 
 # 사이드바 설정
-
 with st.sidebar:
     # 언어 선택
     selected_language = st.selectbox(
@@ -38,93 +38,64 @@ with st.sidebar:
         [lang['candlestick'], lang['line']]
     )
 
-# ETF 목록도 별도 파일로 분리할 수 있습니다
-etf_list = {
-    'SPY': 'S&P 500 ETF',
-    'VOO': 'Vanguard S&P 500',
-    'VTI': 'Vanguard Total Stock Market',
-    'QQQ': 'Nasdaq 100 ETF',
-    'IVV': 'iShares Core S&P 500',
-    'BND': 'Vanguard Total Bond Market',
-    'VEA': 'Vanguard FTSE Developed Markets',
-    'VTV': 'Vanguard Value ETF',
-    'AGG': 'iShares Core U.S. Aggregate Bond',
-    'VUG': 'Vanguard Growth ETF',
-    'IEFA': 'iShares Core MSCI EAFE',
-    'VWO': 'Vanguard Emerging Markets',
-    'IJR': 'iShares Core S&P Small-Cap',
-    'IWF': 'iShares Russell 1000 Growth',
-    'IWM': 'iShares Russell 2000',
-    'VIG': 'Vanguard Dividend Appreciation',
-    'VXUS': 'Vanguard Total International Stock',
-    'VGT': 'Vanguard Information Technology',
-    'IEMG': 'iShares Core MSCI Emerging Markets',
-    'GLD': 'SPDR Gold Shares',
-    'LQD': 'iShares iBoxx Investment Grade Corporate Bond',
-    'VNQ': 'Vanguard Real Estate',
-    'TLT': 'iShares 20+ Year Treasury Bond',
-    'IWD': 'iShares Russell 1000 Value',
-    'EFA': 'iShares MSCI EAFE'
-}
-
 # 메인 타이틀
-st.title(LANGUAGES[st.session_state.language]['title'])
+st.title(lang['title'])
 
-# 메인 컨텐츠
+# 차트 표시
 cols = st.columns(3)
-for i, symbol in enumerate(etf_list.keys()):
+for i, symbol in enumerate(ETF_LIST.keys()):
     with cols[i % 3]:
         try:
             etf = yf.Ticker(symbol)
-            hist = etf.history(period=LANGUAGES[st.session_state.language]['periods'][period])
+            hist = etf.history(period=lang['periods'][period])
             
-            if chart_type == LANGUAGES[st.session_state.language]['candlestick']:
-                fig = go.Figure(data=[go.Candlestick(x=hist.index,
+            if chart_type == lang['candlestick']:
+                fig = go.Figure(data=[go.Candlestick(
+                    x=hist.index,
                     open=hist['Open'],
                     high=hist['High'],
                     low=hist['Low'],
-                    close=hist['Close'])])
+                    close=hist['Close']
+                )])
             else:
-                fig = go.Figure(data=[go.Scatter(x=hist.index, 
+                fig = go.Figure(data=[go.Scatter(
+                    x=hist.index,
                     y=hist['Close'],
-                    mode='lines',
-                    name=symbol)])
+                    mode='lines'
+                )])
             
             fig.update_layout(
-                title=f'{symbol} - {etf_list[symbol]}',
+                title=f'{symbol} - {ETF_LIST[symbol]}',
                 height=400,
-                xaxis_title="날짜",
-                yaxis_title="가격 (USD)",
+                xaxis_title="Date",
+                yaxis_title="Price (USD)",
                 template="plotly_white"
             )
             
             st.plotly_chart(fig, use_container_width=True)
             
-            # 기본 정보 표시
-            current_price = hist['Close'][-1]
-            price_change = ((current_price - hist['Close'][0]) / hist['Close'][0]) * 100
-            volume = hist['Volume'][-1]
-            
-            # 메트릭 컨테이너
+            # 메트릭 표시
             metrics_cols = st.columns(3)
+            current_price = hist['Close'].iloc[-1]
+            price_change = ((current_price - hist['Close'].iloc[0]) / hist['Close'].iloc[0]) * 100
+            
             metrics_cols[0].metric(
-                LANGUAGES[st.session_state.language]['current_price'],
+                lang['current_price'],
                 f"${current_price:.2f}",
                 f"{price_change:.2f}%"
             )
             metrics_cols[1].metric(
-                LANGUAGES[st.session_state.language]['volume'],
-                f"{volume:,.0f}"
+                lang['volume'],
+                f"{hist['Volume'].iloc[-1]:,.0f}"
             )
             metrics_cols[2].metric(
-                LANGUAGES[st.session_state.language]['high'],
-                f"${hist['High'][-1]:.2f}"
+                lang['high'],
+                f"${hist['High'].iloc[-1]:.2f}"
             )
             
         except Exception as e:
-            st.error(f"{symbol} 데이터 로딩 중 오류 발생")
+            st.error(f"Error loading {symbol}: {str(e)}")
 
-# 페이지 하단 정보
+# 마지막 업데이트 시간
 st.sidebar.markdown("---")
-
-st.sidebar.info(f"{LANGUAGES[st.session_state.language]['last_update']}: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+st.sidebar.info(f"{lang['last_update']}: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
