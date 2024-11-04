@@ -3,21 +3,21 @@ import yfinance as yf
 import plotly.graph_objects as go
 from datetime import datetime
 from languages import LANGUAGES
-from etf_data import ETF_LIST  # ETF 목록 import
+from etf_data import ETF_LIST 
 
-# 페이지 설정
+# page config
 st.set_page_config(layout="wide")
 
-# 세션 상태 초기화
+# session state initialize
 if 'language' not in st.session_state:
     st.session_state.language = 'English'
 
-# 사이드바 설정
+# sidebar config
 with st.sidebar:
-    # 이전 언어 저장
+    # previous language
     previous_language = st.session_state.language
     
-    # 언어 선택
+    # language selector
     selected_language = st.selectbox(
         'Language / 언어 / 语言 / 言語 / Idioma',
         options=list(LANGUAGES.keys()),
@@ -25,10 +25,10 @@ with st.sidebar:
         key='language_selector'
     )
     
-    # 언어가 변경되었을 때만 세션 상태 업데이트
+    # update session state if language is changed
     if selected_language != previous_language:
         st.session_state.language = selected_language
-        st.rerun()  # experimental_rerun() 대신 rerun() 사용
+        st.rerun()
 
     lang = LANGUAGES[st.session_state.language]
     
@@ -43,10 +43,10 @@ with st.sidebar:
         [lang['candlestick'], lang['line']]
     )
 
-# 메인 타이틀
+# main title
 st.title(lang['title'])
 
-# 차트 표시
+# chart display
 cols = st.columns(3)
 for i, symbol in enumerate(ETF_LIST.keys()):
     with cols[i % 3]:
@@ -79,7 +79,7 @@ for i, symbol in enumerate(ETF_LIST.keys()):
             
             st.plotly_chart(fig, use_container_width=True)
             
-            # 메트릭 표시
+            # metrics display
             metrics_cols = st.columns(3)
             current_price = hist['Close'].iloc[-1]
             price_change = ((current_price - hist['Close'].iloc[0]) / hist['Close'].iloc[0]) * 100
@@ -101,6 +101,6 @@ for i, symbol in enumerate(ETF_LIST.keys()):
         except Exception as e:
             st.error(f"Error loading {symbol}: {str(e)}")
 
-# 마지막 업데이트 시간
+# last update time
 st.sidebar.markdown("---")
 st.sidebar.info(f"{lang['last_update']}: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
