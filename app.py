@@ -1,15 +1,44 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
-import plotly.graph_objects as go
 import yfinance as yf
+import plotly.graph_objects as go
 from datetime import datetime
+from languages import LANGUAGES
 
 # 페이지 설정
-st.set_page_config(page_title="ETF 트래커", layout="wide", memory_limit=1024)
-st.title("Top 25 ETF 가격 동향")
+st.set_page_config(layout="wide")
 
-# ETF 목록
+# 세션 상태 초기화
+if 'language' not in st.session_state:
+    st.session_state.language = 'English'
+
+# 사이드바 설정
+
+with st.sidebar:
+    # 언어 선택
+    selected_language = st.selectbox(
+        'Language / 언어 / 语言 / 言語 / Idioma',
+        options=list(LANGUAGES.keys()),
+        index=list(LANGUAGES.keys()).index(st.session_state.language)
+    )
+    
+    if selected_language != st.session_state.language:
+        st.session_state.language = selected_language
+        st.experimental_rerun()
+
+    lang = LANGUAGES[st.session_state.language]
+    
+    st.header(lang['settings'])
+    period = st.selectbox(
+        lang['period'],
+        options=list(lang['periods'].keys())
+    )
+    
+    chart_type = st.radio(
+        lang['chart_type'],
+        [lang['candlestick'], lang['line']]
+    )
+
+# ETF 목록도 별도 파일로 분리할 수 있습니다
 etf_list = {
     'SPY': 'S&P 500 ETF',
     'VOO': 'Vanguard S&P 500',
@@ -38,44 +67,18 @@ etf_list = {
     'EFA': 'iShares MSCI EAFE'
 }
 
-# 사이드바 설정
-with st.sidebar:
-    st.header("설정")
-    period = st.selectbox(
-        "기간 선택",
-        ["1일", "1주일", "1개월", "3개월", "6개월", "1년"],
-        index=2
-    )
-    
-    period_map = {
-        "1일": "1d",
-        "1주일": "1wk",
-        "1개월": "1mo",
-        "3개월": "3mo",
-        "6개월": "6mo",
-        "1년": "1y"
-    }
-    
-    chart_type = st.radio(
-        "차트 종류",
-        ["캔들스틱", "라인"]
-    )
-    
-    selected_etfs = st.multiselect(
-        "표시할 ETF 선택",
-        list(etf_list.keys()),
-        default=list(etf_list.keys())[:6]
-    )
+# 메인 타이틀
+st.title(LANGUAGES[st.session_state.language]['title'])
 
 # 메인 컨텐츠
 cols = st.columns(3)
-for i, symbol in enumerate(selected_etfs):
+for i, symbol in enumerate(etf_list.keys()):
     with cols[i % 3]:
         try:
             etf = yf.Ticker(symbol)
-            hist = etf.history(period=period_map[period])
+            hist = etf.history(period=LANGUAGES[st.session_state.language]['periods'][period])
             
-            if chart_type == "캔들스틱":
+            if chart_type == LANGUAGES[st.session_state.language]['candlestick']:
                 fig = go.Figure(data=[go.Candlestick(x=hist.index,
                     open=hist['Open'],
                     high=hist['High'],
@@ -105,16 +108,16 @@ for i, symbol in enumerate(selected_etfs):
             # 메트릭 컨테이너
             metrics_cols = st.columns(3)
             metrics_cols[0].metric(
-                "현재가",
+                LANGUAGES[st.session_state.language]['current_price'],
                 f"${current_price:.2f}",
                 f"{price_change:.2f}%"
             )
             metrics_cols[1].metric(
-                "거래량",
+                LANGUAGES[st.session_state.language]['volume'],
                 f"{volume:,.0f}"
             )
             metrics_cols[2].metric(
-                "고가",
+                LANGUAGES[st.session_state.language]['high'],
                 f"${hist['High'][-1]:.2f}"
             )
             
@@ -124,4 +127,4 @@ for i, symbol in enumerate(selected_etfs):
 # 페이지 하단 정보
 st.sidebar.markdown("---")
 
-st.sidebar.info(f"마지막 업데이트: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+st.sidebar.info(f"{LANGUAGES[st.session_state.language]['last_update']}: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
