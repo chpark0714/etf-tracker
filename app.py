@@ -79,17 +79,17 @@ else:
 for i, symbol in enumerate(list(ETF_LIST.keys())[:6]):
     with cols[i % (1 if is_mobile() else 3)]:
         try:
+            # 모바일일 때 구분선 추가 (첫 번째 항목 제외)
+            if is_mobile() and i > 0:
+                st.markdown("""
+                    <hr style="height:2px;border-width:0;color:gray;background-color:#f0f0f0;margin:25px 0;">
+                """, unsafe_allow_html=True)
+            
             etf = yf.Ticker(symbol)
             hist = etf.history(period=lang['periods'][period])
             
-            # 데이터가 비어있는지 확인
             if hist.empty:
                 st.error(f"No data available for {symbol}")
-                continue
-                
-            # 데이터가 충분한지 확인
-            if len(hist) < 2:
-                st.error(f"Insufficient data for {symbol}")
                 continue
             
             # 차트 생성
@@ -109,24 +109,32 @@ for i, symbol in enumerate(list(ETF_LIST.keys())[:6]):
                     mode='lines'
                 )
             
-            # 모바일 최적화된 레이아웃
-            fig.update_layout(
-                title=f'{symbol} - {ETF_LIST[symbol]}',
-                height=350 if is_mobile() else 400,
-                margin=dict(l=10, r=10, t=40, b=20),
-                xaxis_title=None if is_mobile() else "Date",
-                yaxis_title=None if is_mobile() else "Price (USD)",
-                template="plotly_white"
-            )
+            # 모바일일 때와 데스크톱일 때 다른 레이아웃 적용
+            if is_mobile():
+                fig.update_layout(
+                    title=f'{symbol} - {ETF_LIST[symbol]}',
+                    height=300,
+                    margin=dict(l=10, r=10, t=40, b=20),
+                    showlegend=False,
+                    xaxis_rangeslider_visible=False,  # 모바일에서는 하단 작은 그래프 제거
+                )
+            else:
+                fig.update_layout(
+                    title=f'{symbol} - {ETF_LIST[symbol]}',
+                    height=400,
+                    margin=dict(l=20, r=20, t=40, b=20),
+                    xaxis_title="Date",
+                    yaxis_title="Price (USD)",
+                    template="plotly_white"
+                )
             
             st.plotly_chart(fig, use_container_width=True)
             
-            # 메트릭 표시 - 안전하게 데이터 접근
-            current_price = hist['Close'].iloc[-1] if not hist.empty else 0
-            first_price = hist['Close'].iloc[0] if not hist.empty else 0
-            price_change = ((current_price - first_price) / first_price * 100) if first_price != 0 else 0
-            
+            # 메트릭 표시
             metrics_cols = st.columns(3)
+            current_price = hist['Close'].iloc[-1]
+            price_change = ((current_price - hist['Close'].iloc[0]) / hist['Close'].iloc[0] * 100)
+            
             metrics_cols[0].metric(
                 lang['current_price'],
                 f"${current_price:.2f}",
@@ -135,24 +143,16 @@ for i, symbol in enumerate(list(ETF_LIST.keys())[:6]):
             
             metrics_cols[1].metric(
                 lang['volume'],
-                f"{hist['Volume'].iloc[-1]:,.0f}" if not hist.empty else "N/A"
+                f"{hist['Volume'].iloc[-1]:,.0f}"
             )
             
             metrics_cols[2].metric(
                 lang['high'],
-                f"${hist['High'].iloc[-1]:.2f}" if not hist.empty else "N/A"
+                f"${hist['High'].iloc[-1]:.2f}"
             )
             
         except Exception as e:
             st.error(f"Error loading {symbol}: {str(e)}")
-            # 오류 발생 시 재시도 로직 추가
-            try:
-                time.sleep(1)  # 1초 대기
-                etf = yf.Ticker(symbol)
-                hist = etf.history(period=lang['periods'][period])
-                # ... (재시도 로직)
-            except:
-                continue
 
 # 모바일에서 마지막 업데이트 시간 위치 조정
 if is_mobile():
